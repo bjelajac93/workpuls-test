@@ -1,0 +1,26 @@
+@import "./variables";
+@import "./buttons";
+@import "./dialog";
+@import "./form";
+@import "./paginator";
+@import "./time-picker";
+@import "./table";
+@import "./notification";
+@import "~overlayscrollbars/css/OverlayScrollbars.css";
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dialog-responsive {
+    min-width: 1000px !important;
+  }
+}

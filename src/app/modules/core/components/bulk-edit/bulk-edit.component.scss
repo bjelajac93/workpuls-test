@@ -1,0 +1,21 @@
+.example-container {
+  height: auto;
+  overflow: hidden;
+
+  table {
+    width: 100%;
+  }
+
+  hr {
+    &.solid {
+      border-top: 3px solid #bbb;
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
+  }
+
+  .form-title {
+    display: flex;
+    padding: 10px 0;
+  }
+}

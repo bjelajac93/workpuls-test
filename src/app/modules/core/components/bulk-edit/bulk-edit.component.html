@@ -1,0 +1,211 @@
+<h2 mat-dialog-title>Bulk edit {{ selectedEmployeeIds?.length ?? 0 }} entries</h2>
+<mat-dialog-content class="mat-typography">
+  <ng-template #loading>
+    <div class="section-container">
+      <span class="loading-container"> LOADING... </span>
+    </div>
+  </ng-template>
+  <div
+    class="example-container"
+    *ngIf="
+      !(loadingEmployees$ | async) || !(loadingShifts$ | async);
+      else loading
+    "
+  >
+    <div style="flex-direction: column; align-items: center">
+      <form [formGroup]="bulkEditForm">
+        <div
+          *ngFor="
+            let employee of employees?.controls;
+            let ei = index;
+            last as isLast
+          "
+          formArrayName="employees"
+        >
+          <span class="form-title">Employee {{ ei + 1 }}:</span>
+
+          <div [formGroupName]="ei">
+            <div style="display: flex; flex-direction: column; gap: 15px">
+              <div style="display: flex; flex-direction: row; gap: 15px">
+                <div style="width: 33.33%; display: flex">
+                  <mat-form-field appearance="outline" class="full-width-field">
+                    <mat-label>Employee name</mat-label>
+                    <input
+                      formControlName="name"
+                      matInput
+                      id="name-{{ ei }}"
+                    />
+                    <mat-error *ngIf="!employee.get('name')?.valid"
+                      >Please enter a valid Employee name
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div style="width: 33.33%; display: flex">
+                  <mat-form-field appearance="outline" floatLabel="always">
+                    <mat-label>Hourly rate</mat-label>
+                    <input
+                      matInput
+                      matInputCommified
+                      formControlName="hourlyRate"
+                      matInput
+                      id="hourlyRate-{{ ei }}"
+                    />
+                    <span matPrefix>$&nbsp;</span>
+                    <mat-error *ngIf="!employee.get('hourlyRate')?.valid"
+                      >Please enter a valid hourly rate
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+                <div style="width: 33.33%; display: flex">
+                  <mat-form-field appearance="outline" class="full-width-field">
+                    <mat-label>Overtime hourly rate</mat-label>
+                    <input
+                      matInput
+                      matInputCommified
+                      formControlName="overtimeHourlyRate"
+                      matInput
+                      id="overtimeHourlyRate-{{ ei }}"
+                    />
+                    <span matPrefix>$&nbsp;</span>
+                    <mat-error
+                      *ngIf="!employee.get('overtimeHourlyRate')?.valid"
+                      >Please enter a valid overtime hourly rate</mat-error
+                    >
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; padding: 15px">
+                <div formArrayName="shifts">
+                  <cdk-virtual-scroll-viewport
+                    [tvsItemSize]="48"
+                    [headerHeight]="56"
+                    style="height: 200px"
+                  >
+                    <table mat-table [dataSource]="dataSources[ei]">
+                      <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef>Shift</th>
+                        <td mat-cell *matCellDef="let element; let i = index">
+                          Shift {{ i + 1 }}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="clock-in">
+                        <th mat-header-cell *matHeaderCellDef>Clock in time</th>
+                        <td
+                          mat-cell
+                          *matCellDef="let element; let index = index"
+                          [formGroupName]="index"
+                        >
+                          <mat-form-field
+                            appearance="outline"
+                            class="time-picker"
+                          >
+                            <mat-label>HH:MM</mat-label>
+                            <input
+                              matTimepicker
+                              #clockInPicker="matTimepicker"
+                              color="accent"
+                              id="clock-in-{{ index }}"
+                              mode="24h"
+                              placeholder="Please select time..."
+                              formControlName="clockIn"
+                              name="clockIn"
+                              [required]="true"
+                            />
+                            <mat-icon
+                              matSuffix
+                              (click)="clockInPicker.showDialog()"
+                              >access_time</mat-icon
+                            >
+                          </mat-form-field>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="clock-out">
+                        <th mat-header-cell *matHeaderCellDef>
+                          Clock out time
+                        </th>
+                        <td
+                          mat-cell
+                          *matCellDef="let element; let index = index"
+                          [formGroupName]="index"
+                        >
+                          <mat-form-field
+                            appearance="outline"
+                            class="time-picker"
+                          >
+                            <mat-label>HH:MM</mat-label>
+                            <input
+                              matTimepicker
+                              #clockOutPicker="matTimepicker"
+                              color="accent"
+                              id="clock-out-{{ index }}"
+                              formControlName="clockOut"
+                              mode="24h"
+                              placeholder="Please select time..."
+                              name="clockOut"
+                              [required]="true"
+                            />
+                            <mat-icon
+                              matSuffix
+                              (click)="clockOutPicker.showDialog()"
+                              >access_time</mat-icon
+                            >
+                          </mat-form-field>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="total">
+                        <th mat-header-cell *matHeaderCellDef>Total time</th>
+                        <td
+                          mat-cell
+                          *matCellDef="let element; let index = index"
+                          [formGroupName]="index"
+                        >
+                          <mat-form-field
+                            appearance="outline"
+                            class="time-picker"
+                          >
+                            <mat-label>HH:MM</mat-label>
+                            <input
+                              matTimepicker
+                              #totalPicker="matTimepicker"
+                              color="accent"
+                              id="total-{{ index }}"
+                              mode="24h"
+                              formControlName="total"
+                              placeholder="Please select time..."
+                              name="total"
+                              [required]="true"
+                            />
+                            <mat-icon
+                              matSuffix
+                              (click)="totalPicker.showDialog()"
+                              >access_time</mat-icon
+                            >
+                          </mat-form-field>
+                        </td>
+                      </ng-container>
+
+                      <tr
+                        mat-header-row
+                        *matHeaderRowDef="displayedColumns; sticky: true"
+                      ></tr>
+                      <tr
+                        mat-row
+                        *matRowDef="let row; columns: displayedColumns"
+                      ></tr>
+                    </table>
+                  </cdk-virtual-scroll-viewport>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="solid" *ngIf="!isLast" />
+        </div>
+      </form>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button (click)="onSubmit()" cdkFocusInitial>Save</button>
+</mat-dialog-actions>

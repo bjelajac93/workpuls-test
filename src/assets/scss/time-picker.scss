@@ -1,0 +1,9 @@
+.timepicker-backdrop-overlay,
+.timepicker-overlay {
+  z-index: 1000 !important;
+}
+.time-picker {
+  .mat-form-field-wrapper {
+    padding: 0 !important;
+  }
+}

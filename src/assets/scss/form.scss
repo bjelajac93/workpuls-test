@@ -1,0 +1,12 @@
+.full-width-field {
+  width: 100%;
+}
+
+.mat-form-field-prefix,
+.mat-form-field-suffix {
+  top: 0 !important;
+}
+
+input.custom-right-align {
+  -moz-appearance: textfield;
+}

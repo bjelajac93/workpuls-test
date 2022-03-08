@@ -32,7 +32,7 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss"
+              "src/assets/scss/styles.scss"
             ],
             "scripts": []
           },
@@ -72,11 +72,17 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
+            "options": {
+              "browserTarget": "workpuls:build",
+              "proxyConfig": "proxy.conf.json"
+            },
             "production": {
-              "browserTarget": "workpuls:build:production"
+              "browserTarget": "workpuls:build:production",
+              "proxyConfig": "proxy.conf.json"
             },
             "development": {
-              "browserTarget": "workpuls:build:development"
+              "browserTarget": "workpuls:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

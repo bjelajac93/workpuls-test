@@ -1,0 +1,19 @@
+@import "./variables";
+
+.mat-snack-bar-container {
+  .mat-simple-snackbar {
+    span,
+    mat-button-wrapper {
+      color: $white-color;
+    }
+  }
+  &.success-snack-bar {
+    background-color: $success-color;
+  }
+  &.error-snack-bar {
+    background-color: $error-color;
+  }
+  &.warning-snack-bar {
+    background-color: $warning-color;
+  }
+}
