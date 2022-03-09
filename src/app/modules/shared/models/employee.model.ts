@@ -4,4 +4,6 @@ export interface Employee {
   email: string;
   hourlyRate: number;
   overtimeHourlyRate: number;
+  totalClockedIn: number;
+  totalClockedOut: number;
 }

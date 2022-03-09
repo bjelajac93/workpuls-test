@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DefaultDataService, HttpUrlGenerator, Logger } from '@ngrx/data';
 import { Observable } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { Employee } from 'src/app/modules/shared/models/employee.model';
 import { environment } from 'src/environments/environment';
 
@@ -18,7 +19,7 @@ export class EmployeeDataService extends DefaultDataService<Employee> {
 
   // Overrided Methods
   getAll(): Observable<Employee[]> {
-    return this.http.get<Employee[]>('/api/employees');
+    return this.http.get<Employee[]>('/api/employees').pipe(delay(2000));
   }
 
   upsert(employee: Employee): Observable<any> {

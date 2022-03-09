@@ -1,7 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   Inject,
   OnInit
@@ -13,9 +12,9 @@ import {
   FormControl,
   FormArray,
 } from '@angular/forms';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { combineLatest, forkJoin, Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Employee } from 'src/app/modules/shared/models/employee.model';
 import { Shift } from 'src/app/modules/shared/models/shift.model';
 import { NotificationService } from 'src/app/modules/shared/services/notification.service';
@@ -69,8 +68,8 @@ export class BulkEditComponent implements OnInit {
     private decimalPipe: DecimalPipe,
     private notificationService: NotificationService,
     private apppEntityServices: AppEntityServices,
-    private cdRef: ChangeDetectorRef,
-    private formValidatorService: FormValidatorService
+    private formValidatorService: FormValidatorService,
+    private dialogRef: MatDialogRef<BulkEditComponent>
   ) {
     this.loadingEmployees$ = this.apppEntityServices.EmployeeService.loading$;
     this.loadingShifts$ = this.apppEntityServices.ShiftService.loading$;
@@ -190,7 +189,9 @@ export class BulkEditComponent implements OnInit {
 
     let agreementForm = this.bulkEditForm.value;
 
-    for (const employee of agreementForm.employees) {
+    const calls: any = [];
+
+    agreementForm.employees.forEach((employee: any) => {
       let upsertEmployee = { ...employee };
       upsertEmployee.hourlyRate = Number(upsertEmployee.hourlyRate);
       upsertEmployee.overtimeHourlyRate = Number(
@@ -198,38 +199,27 @@ export class BulkEditComponent implements OnInit {
       );
       let upsertShifts = [...upsertEmployee.shifts] as Shift[];
       delete upsertEmployee.shifts;
-      let success = false;
-      this.apppEntityServices.EmployeeService.upsert(upsertEmployee).subscribe(
-        () => {
-          this.notificationService.success(
-            'Entry has been successfully updated.',
-            'SUCCESS!'
-          );
-          for (const shift of upsertShifts) {
-            this.apppEntityServices.ShiftService.upsert(shift).subscribe(
-              () => {
-                this.notificationService.success(
-                  'Entry have been successfully updated.',
-                  'SUCCESS!'
-                );
-              },
-              (error) => {
-                this.notificationService.error(
-                  'Entry have not been updated.',
-                  'ERROR!'
-                );
-              }
-            );
-          }
-        },
-        (error) => {
-          this.notificationService.error(
-            'Entires have not been updated.',
-            'ERROR!'
-          );
-        }
-      );
-    }
+      for (const shift of upsertShifts) {
+        calls.push(this.apppEntityServices.ShiftService.upsert(shift));
+      }
+      calls.push(this.apppEntityServices.EmployeeService.upsert(upsertEmployee));
+    });
+
+    forkJoin(calls).subscribe(
+      () => {
+        this.notificationService.success(
+          'Entires have been successfully updated.',
+          'SUCCESS!'
+        );
+        this.dialogRef.close();
+      },
+      (error) => {
+        this.notificationService.success(
+          'Entires have not been updated.',
+          'ERROR!'
+        );
+      }
+    );
   }
 
   timeChangeHandler(data: any) {

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DefaultDataService, HttpUrlGenerator, Logger } from '@ngrx/data';
 import { Observable } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { Shift } from 'src/app/modules/shared/models/shift.model';
 import { environment } from 'src/environments/environment';
 
@@ -18,7 +19,7 @@ export class ShiftDataService extends DefaultDataService<Shift> {
 
   // Overrided Methods
   getAll(): Observable<Shift[]> {
-    return this.http.get<Shift[]>('/api/shifts');
+    return this.http.get<Shift[]>('/api/shifts').pipe(delay(2000));;
   }
 
   upsert(shift: Shift): Observable<any> {

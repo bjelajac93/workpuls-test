@@ -3,117 +3,77 @@
     <span class="loading-container"> LOADING... </span>
   </div>
 </ng-template>
-<div
-  class="section-container"
-  *ngIf="
+<div class="section-container" *ngIf="
     !(loadingEmployees$ | async) || !(loadingShifts$ | async);
     else loading
-  "
->
-  <div
-    class="general-items-section"
-    [class.main-is-mobile]="mobileQuery.matches"
-  >
-    <app-card-total
-      [title]="numberOfEmployees.toString()"
-      [subtitle]="'Number of Employees'"
-    ></app-card-total>
-    <app-card-total
-      [title]="totalClockedIn.toString()"
-      [subtitle]="'Clocked in'"
-    ></app-card-total>
-    <app-card-total
-      [title]="(totalHourlyAmmount | currency) ?? '0'"
-      [subtitle]="'Amount'"
-    ></app-card-total>
-    <app-card-total
-      [title]="(totalOvertimeHourlyAmmount | currency) ?? '0'"
-      [subtitle]="'Overtime Amount'"
-    ></app-card-total>
+  ">
+  <div class="general-items-section" [class.main-is-mobile]="mobileQuery.matches">
+    <app-card-total [title]="numberOfEmployees.toString()" [subtitle]="'Number of Employees'"></app-card-total>
+    <app-card-total [title]="totalClockedIn.toString()" [subtitle]="'Clocked in'"></app-card-total>
+    <app-card-total [title]="(totalHourlyAmmount | currency) ?? '$0'" [subtitle]="'Amount'"></app-card-total>
+    <app-card-total [title]="(totalOvertimeHourlyAmmount | currency) ?? '$0'" [subtitle]="'Overtime Amount'">
+    </app-card-total>
   </div>
 
   <div class="employees-table-section">
     <mat-card>
       <div class="bulk-section">
-        <button
-          mat-raised-button
-          color="primary"
-          [disabled]="selection?.selected?.length == 0"
-          (click)="openDialog()"
-        >
+        <button mat-raised-button color="primary" [disabled]="selection?.selected?.length == 0" (click)="openDialog()">
           Bulk Edit
         </button>
       </div>
-        <cdk-virtual-scroll-viewport
-          [tvsItemSize]="48"
-          [headerHeight]="56"
-          style="height: 500px"
-        >
-          <table mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="select">
-              <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox
-                  (change)="$event ? masterToggle() : null"
-                  [checked]="selection.hasValue() && isAllSelected()"
-                  [indeterminate]="selection.hasValue() && !isAllSelected()"
-                  [aria-label]="checkboxLabel()"
-                >
-                </mat-checkbox>
-              </th>
-              <td mat-cell *matCellDef="let row">
-                <mat-checkbox
-                  (click)="$event.stopPropagation()"
-                  (change)="$event ? selection.toggle(row) : null"
-                  [checked]="selection.isSelected(row)"
-                  [aria-label]="checkboxLabel(row)"
-                >
-                </mat-checkbox>
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Employee Name</th>
-              <td mat-cell *matCellDef="let element">{{ element.name }}</td>
-            </ng-container>
-            <ng-container matColumnDef="email">
-              <th mat-header-cell *matHeaderCellDef>Email</th>
-              <td mat-cell *matCellDef="let element">{{ element.email }}</td>
-            </ng-container>
-            <ng-container matColumnDef="clock-in">
-              <th mat-header-cell *matHeaderCellDef>Clocked in</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.clockedInATime }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="total-amount">
-              <th mat-header-cell *matHeaderCellDef>Amount</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.hourlyRate }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="clock-out">
-              <th mat-header-cell *matHeaderCellDef>Clocked Out</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.clockedInATime }}
-              </td>
-            </ng-container>
-            <ng-container matColumnDef="total-overtime-amount">
-              <th mat-header-cell *matHeaderCellDef>Overtime Amount</th>
-              <td mat-cell *matCellDef="let element">
-                {{ element.overtimeHourlyRate }}
-              </td>
-            </ng-container>
+      <cdk-virtual-scroll-viewport [tvsItemSize]="48" [headerHeight]="56" style="height: 500px">
+        <table mat-table [dataSource]="dataSource">
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Employee Name</th>
+            <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+          </ng-container>
+          <ng-container matColumnDef="clock-in">
+            <th mat-header-cell *matHeaderCellDef>Clocked in</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.totalClockedIn }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="total-amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let element">
+              {{ ((element.hourlyRate * element.totalClockedIn) | currency) }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="clock-out">
+            <th mat-header-cell *matHeaderCellDef>Clocked Out</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.totalClockedOut }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="total-overtime-amount">
+            <th mat-header-cell *matHeaderCellDef>Overtime Amount</th>
+            <td mat-cell *matCellDef="let element">
+              {{ ((element.overtimeHourlyRate * element.totalClockedOut) | currency) }}
+            </td>
+          </ng-container>
 
-            <tr
-              mat-header-row
-              *matHeaderRowDef="displayedColumns; sticky: true"
-            ></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              (click)="selection.toggle(row)"
-            ></tr>
-          </table>
-        </cdk-virtual-scroll-viewport>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="selection.toggle(row)"></tr>
+        </table>
+      </cdk-virtual-scroll-viewport>
     </mat-card>
   </div>
 </div>

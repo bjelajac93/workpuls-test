@@ -7,18 +7,18 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { BulkEditComponent } from '../core/components/bulk-edit/bulk-edit.component';
 import { Employee } from '../shared/models/employee.model';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { delay, map, takeUntil } from 'rxjs/operators';
 import { AppEntityServices } from '../entity-store/entity-services';
 import { Shift } from '../shared/models/shift.model';
 import { minutesToHours } from 'src/assets/utils/calculator';
 import { environment } from 'src/environments/environment';
 import { MatPaginator } from '@angular/material/paginator';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit {
     media: MediaMatcher,
     public dialog: MatDialog,
     private apppEntityServices: AppEntityServices,
-    private cdRef: ChangeDetectorRef
+    private notificationService: NotificationService,
   ) {
     this.loadingEmployees$ = this.apppEntityServices.EmployeeService.loading$;
     this.loadingShifts$ = this.apppEntityServices.ShiftService.loading$;
@@ -77,26 +77,30 @@ export class DashboardComponent implements OnInit {
         takeUntil(this.destroy$),
         map((d) => {
           return {
-            employees: d[0],
+            employees: d[0].map(obj => {
+              return {...obj, totalClockedIn: 0, totalClockedOut: 0};
+            }),
             shifts: d[1],
           };
         })
       )
       .subscribe({
         next: (response) => {
+          this.selection.clear();
           this.employees = response.employees;
           this.shifts = response.shifts;
 
-          if (this.shifts.length && this.employees.length) {
-            this.calculateTotals();
-          }
+          this.dataSource = new TableVirtualScrollDataSource<Employee>(
+            this.employees
+          );
 
-          this.dataSource = new TableVirtualScrollDataSource<Employee>(this.employees);
-          this.dataSource.paginator = this.paginator;
+          this.calculateTotals();
         },
-        complete: () => {},
         error: (err) => {
-          alert('error');
+          this.notificationService.error(
+            'Something went wrong. Please try again.',
+            'ERROR!'
+          );
         },
       });
   }
@@ -127,7 +131,7 @@ export class DashboardComponent implements OnInit {
 
   openDialog() {
     const dialogRef = this.dialog.open(BulkEditComponent, {
-      data: this.selection.selected.map(a => a.id),
+      data: this.selection.selected.map((a) => a.id),
       panelClass: 'dialog-responsive',
     });
 
@@ -151,16 +155,35 @@ export class DashboardComponent implements OnInit {
 
       let totalHours = hours + minutesToHours(minutes);
 
-      if (totalHours <= environment.dailyShift) {
-        this.totalClockedIn += totalHours;
-        this.totalHourlyAmmount += totalHours * (this.employees.find(e => e.id === shift.employeeId)?.hourlyRate ?? 0);
-      } else {
-        this.totalClockedIn += environment.dailyShift;
-        this.totalClockedOut += totalHours - environment.dailyShift;
-        this.totalHourlyAmmount += environment.dailyShift * (this.employees.find(e => e.id === shift.employeeId)?.hourlyRate ?? 0);
-        this.totalOvertimeHourlyAmmount += (totalHours - environment.dailyShift) * (this.employees.find(e => e.id === shift.employeeId)?.overtimeHourlyRate ?? 0);
+      let employeeIndex = this.employees.findIndex(
+        (e) => e.id === shift.employeeId
+      );
+
+      if (employeeIndex != -1) {
+        let employee = this.employees[employeeIndex];
+
+        if (totalHours <= environment.dailyShift) {
+          employee.totalClockedIn += totalHours;
+        } else {
+          employee.totalClockedIn += environment.dailyShift;
+          employee.totalClockedOut += (totalHours - environment.dailyShift);
+        }
       }
     }
+
+    this.totalHourlyAmmount = this.employees
+      .map((p) => (p.totalClockedIn ?? 0) * p.hourlyRate)
+      .reduce((a, b) => a + b, 0);
+    this.totalOvertimeHourlyAmmount += this.employees
+      .map((p) => (p.totalClockedOut ?? 0) * p.overtimeHourlyRate)
+      .reduce((a, b) => a + b, 0);
+
+    this.totalClockedIn = this.employees
+      .map((e) => e.totalClockedIn)
+      .reduce((a, b) => a + b, 0);
+    this.totalClockedOut = this.employees
+      .map((e) => e.totalClockedOut)
+      .reduce((a, b) => a + b, 0);
   }
 
   ngOnDestroy() {
