@@ -10,7 +10,7 @@ describe('CardTotalComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ CardTotalComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

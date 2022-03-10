@@ -10,7 +10,7 @@ describe('BulkEditComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ BulkEditComponent ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

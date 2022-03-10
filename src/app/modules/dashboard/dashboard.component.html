@@ -4,7 +4,7 @@
   </div>
 </ng-template>
 <div class="section-container" *ngIf="
-    !(loadingEmployees$ | async) || !(loadingShifts$ | async);
+    (loadingEmployees$ | async) === false || (loadingShifts$ | async) === false;
     else loading
   ">
   <div class="general-items-section" [class.main-is-mobile]="mobileQuery.matches">
@@ -18,7 +18,7 @@
   <div class="employees-table-section">
     <mat-card>
       <div class="bulk-section">
-        <button mat-raised-button color="primary" [disabled]="selection?.selected?.length == 0" (click)="openDialog()">
+        <button mat-raised-button color="primary" [disabled]="selection?.selected?.length === 0" (click)="openDialog()">
           Bulk Edit
         </button>
       </div>

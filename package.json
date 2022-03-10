@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "lint": "npx eslint \"src/**/*.{js,jsx,ts,tsx,html,css,scss}\" --quiet --fix",
+    "lint": "npx eslint \"src/**/*.{js,jsx,ts,tsx,html}\" --quiet --fix",
     "mock:server": "json-server api/db.json --routes api/routes.json --no-cors=true"
   },
   "private": true,
@@ -43,6 +43,8 @@
     "@angular-eslint/template-parser": "12.7.0",
     "@angular/cli": "~12.2.5",
     "@angular/compiler-cli": "~12.2.0",
+    "@babel/core": "^7.17.5",
+    "@babel/eslint-parser": "^7.17.0",
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "4.28.2",

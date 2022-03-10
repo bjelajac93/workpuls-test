@@ -8,50 +8,31 @@
       "files": [
         "*.ts"
       ],
-      "extends": [
-        "plugin:@angular-eslint/recommended",
-        // This is required if you use inline templates in Components
-        "plugin:@angular-eslint/template/process-inline-templates"
-      ],
-      "parser": "babel-eslint",
       "parserOptions": {
         "project": [
           "tsconfig.json"
         ],
-        "createDefaultProgram": true,
-        "ecmaFeatures": {
-          "legacyDecorators": true
-        }
+        "createDefaultProgram": true
       },
+      "extends": [
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
       "rules": {
-        /**
-         * Any TypeScript source code (NOT TEMPLATE) related rules you wish to use/reconfigure over and above the
-         * recommended set provided by the @angular-eslint project would go here.
-         */
-        "@angular-eslint/component-selector": [
-          "error",
-          {
-            "prefix": "app",
-            "style": "kebab-case",
-            "type": "element"
-          }
-        ],
         "@angular-eslint/directive-selector": [
           "error",
           {
+            "type": "attribute",
             "prefix": "app",
-            "style": "camelCase",
-            "type": "attribute"
+            "style": "camelCase"
           }
         ],
-        "sort-imports": [
+        "@angular-eslint/component-selector": [
           "error",
           {
-            "ignoreCase": false,
-            "ignoreDeclarationSort": false,
-            "ignoreMemberSort": false,
-            "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
-            "allowSeparatedGroups": false
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
           }
         ],
         "quotes": [2, "single", { "avoidEscape": true }],
@@ -64,9 +45,6 @@
             "body": 1, 
             "parameters": 2
           },
-          "StaticBlock": {
-            "body": 1
-          },
           "CallExpression": {
             "arguments": 1
           },
@@ -76,8 +54,7 @@
           "flatTernaryExpressions": true,
           "offsetTernaryExpressions": false,
           "ignoreComments": true
-        }],
-        "no-mixed-spaces-and-tabs": "error" // disallows mixed spaces and tabs for indentation.
+        }]
       }
     },
     {
@@ -87,12 +64,7 @@
       "extends": [
         "plugin:@angular-eslint/template/recommended"
       ],
-      "rules": {
-        /**
-         * Any template/HTML related rules you wish to use/reconfigure over and above the
-         * recommended set provided by the @angular-eslint project would go here.
-         */
-      }
+      "rules": {}
     }
   ]
 }

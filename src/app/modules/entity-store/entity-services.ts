@@ -20,8 +20,8 @@ export class AppEntityServices extends EntityServicesBase {
   ) {
     super(elements);
     this.registerEntityCollectionServices([
-        employeeService,
-        shiftService
+      employeeService,
+      shiftService
     ]);
   }
 

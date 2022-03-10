@@ -8,7 +8,7 @@
   <div
     class="example-container"
     *ngIf="
-      !(loadingEmployees$ | async) || !(loadingShifts$ | async);
+      (loadingEmployees$ | async) === false || (loadingShifts$ | async) === false;
       else loading
     "
   >
